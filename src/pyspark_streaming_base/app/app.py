@@ -101,9 +101,16 @@ class App(SparkLoggingProvider):
         return self
 
     def initialize(self) -> Self:
+
+        # check for the spark.app.name
+        self.app_name = self.spark.conf.get(key="spark.app.name", default=self.app_name)
+
+        # check for spark.app.version
+        self.app_version = self.spark.conf.get(key="spark.app.version", default=self.app_version)
+
         # check the logging prefix if it is overridden, then respect the new value
         self.app_logging_prefix = self.spark.conf.get(
-            key="spark.app.logger.prefix", default=self.app_logging_prefix
+            key="spark.app.logging.prefix", default=self.app_logging_prefix
         )
         self.logger = self.get_logger(spark=self.spark, prefix=self.app_logging_prefix)
 

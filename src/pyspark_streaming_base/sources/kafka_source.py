@@ -1,34 +1,17 @@
 from typing import Optional, Dict, Self
 
+from pyspark.sql import SparkSession
 from pyspark.sql.streaming import DataStreamReader
-
-from pyspark_streaming_base.app import StreamingApp
+from pyspark_streaming_base.sources import StreamingSource
 
 # the streaming app provides access to the singleton SparkSession
 # the alternative is to use SparkSession.active() to get the active session
 # it all really depends on if it makes sense to carry a reference around
 
-class KafkaStreamingSource:
-    """
-    Provides functionality to define and configure a Kafka streaming source
-    within a streaming application. This class is responsible for managing
-    the integration of a Kafka source into a streaming application's pipeline.
-
-    :ivar app: The streaming application instance to which this Kafka source
-        is attached.
-    :type app: StreamingApp
-    :ivar config_prefix: The configuration key prefix used to specify Kafka
-        options in the application settings.
-    :type config_prefix: str
-    """
-    app: StreamingApp
-    config_prefix: str = "spark.app.source.kafka"
-    config_options_prefix: str = f"{config_prefix}.options"
-
-    _initialized: bool = False
+class KafkaStreamingSource(StreamingSource):
 
     # @link: https://spark.apache.org/docs/latest/streaming/structured-streaming-kafka-integration.html
-    options: Dict[str, str|None] = {
+    source_options = {
         # failOnDataLoss (bool) is used to ignore offsets that have already been deleted between app runs
         # A 'data-loss' situation occurs if we can't 'rehydrate' the lost data
         # we can make a decision based on the situation (can we replay or not?)
@@ -86,8 +69,7 @@ class KafkaStreamingSource:
         "maxRecordsPerPartition": "100"
     }
 
-    def __init__(self, app: StreamingApp,
-                 config_prefix: Optional[str] = None,
+    def __init__(self, config_prefix: Optional[str] = None,
                  config: Optional[Dict[str, str]] = None) -> None:
         """
         Initializes a component with a reference to a StreamingApp instance, an optional configuration
@@ -95,39 +77,38 @@ class KafkaStreamingSource:
         used as a namespace or identifier for grouping configuration values. When a configuration
         dictionary is passed, it is applied to the instance during initialization.
 
-        :param app: An instance of the StreamingApp to which the component belongs.
         :param config_prefix: An optional string that serves as a prefix or namespace for the component's
             configuration. Default is None.
         :param config: An optional dictionary of string key-value pairs used to initialize the
             configuration for the component. Default is None.
         """
-        self.app = app
-
-        # use the runtime configuration to update the defaults
-        # you can call this method a second time to pull in any new overrides
-        # before calling generate
-
-        if config_prefix is not None:
-            self.config_prefix = config_prefix
-
-        if config is not None:
-            # this method call will first apply your spark.conf dictionary,
-            # then call with_config_from_spark to update the source options
-            self.with_config(config)
-        else:
-            # set any values directly from the spark configuration
-            # this would be any default values from spark-submit --conf ... or spark.properties...
-            self.with_config_from_spark()
+        super().__init__(
+            source_format='kafka',
+            config_prefix=config_prefix,
+            config=config
+        )
 
 
-    def with_config(self, config: Dict[str, str]) -> Self:
-        # with_config applies any spark.* config directly to the active SparkSession
-        for key, value in config.items():
-            if key.startswith("spark."):
-                self.app.spark.conf.set(key, value)
+    def with_config(self, config: Dict[str, str], session: Optional[SparkSession] = None) -> Self:
+        """
+        Applies configurations to the current instance using the provided SparkSession and
+        a set of configurations defined in a dictionary. This method first utilizes
+        the parent class's with_config functionality to apply the basic configuration
+        to the SparkSession object. Next, it applies additional updates using the
+        with_config_from_spark method (specific to this instance). Finally, this method
+        marks the instance as initialized for future use.
+
+        :param config: A dictionary storing key-value pairs of Spark configuration settings.
+        :param session: An optional SparkSession instance to which the configuration
+            and updates will be applied. If not provided, the configuration will only
+            be processed based on the supplied dictionary.
+        :return: The updated instance of the class with the applied configurations.
+        """
+        # apply the spark.* configuration into the SparkSession
+        super().with_config(config, session)
 
         # then applies the with_config_from_spark updates
-        self.with_config_from_spark()
+        self.with_config_from_spark(session)
 
         # lastly, setting the initialized flag
         # which is here mainly for future use
@@ -135,117 +116,98 @@ class KafkaStreamingSource:
 
         return self
 
-    def with_config_from_spark(self) -> Self:
+    def with_config_from_spark(self, session: Optional[SparkSession] = None) -> Self:
         """
-        A method that configures the Spark options for the application based on
-        specified configurations and default values. The configurations are
-        retrieved dynamically from Spark's runtime configurations, allowing for
-        flexible specification and updating of options related to streaming and
-        Kafka integrations.
+        Updates the configuration of a Kafka-based data source by retrieving relevant
+        settings from the given Spark session or the active Spark session if no session
+        is provided. The function simplifies the management of Kafka options, such as
+        topic subscription, starting and ending offsets, and bootstrap server
+        configuration, ensuring these options are dynamically obtained from Spark's
+        runtime configuration.
 
-        This method modifies the `options` attribute of the caller, setting various
-        parameters based on Spark runtime settings. It retrieves settings for failure
-        handling, Kafka bootstrapping, topic subscriptions, offsets, and partitioning,
-        among others. Default values are used where Spark configuration keys are not
-        explicitly set.
+        The updates to the `source_options` ensure that the options can dynamically
+        adhere to the requirements of a distributed processing environment. Additionally,
+        it supports flexibility in handling Kafka headers, starting positions for reading
+        data, partition configurations, and batching configurations, among others.
 
-        :raises KeyError: Raised when specific Spark configuration keys required for the
-            setup are missing or unresolvable.
-
-        :return: Returns the updated instance of the class.
+        :param session: The SparkSession instance from which the Kafka options are
+            retrieved. If None, the function uses the active Spark session. Defaults
+            to None.
+        :return: The updated instance with Kafka-related configuration options
+            populated from the Spark session.
         :rtype: Self
         """
 
         # simplify passing spark by reference
-        spark = self.app.spark
+        spark = session or SparkSession.active()
 
-        self.options["failOnDataLoss"] = spark.conf.get(
+        self.source_options["failOnDataLoss"] = spark.conf.get(
             key=f"{self.config_options_prefix}.failOnDataLoss",
-            default=self.options["failOnDataLoss"],
+            default=self.source_options["failOnDataLoss"],
         )
 
         # sets the unique groupId prefix
-        # note: the default here will use the app_name:app_checkpoint_version
+        # note: the default here will use the `app_name:app_checkpoint_version`
         # this is done to ensure that we don't generate the same groupId prefix for
         # multiple running applications
-        self.options["groupIdPrefix"] = spark.conf.get(
+        self.source_options["groupIdPrefix"] = spark.conf.get(
             key=f"{self.config_options_prefix}.groupIdPrefix",
-            default=f"{self.app.app_name}:{self.app.app_checkpoint_version}",
+            default=f"{spark.conf.get('spark.app.name')}:{spark.conf.get('spark.app.checkpoints.version')}",
         )
 
         # do we want to include the Kafka headers Array?
-        self.options["includeHeaders"] = spark.conf.get(
+        self.source_options["includeHeaders"] = spark.conf.get(
             key=f"{self.config_options_prefix}.includeHeaders", default="false"
         )
 
         # if subscribe is None, then the application can also take assignments
         # (which is not a usual use case) - it is more common from the driver -> executors per batch
-        self.options["subscribe"] = spark.conf.get(
-            key=f"{self.config_prefix}.topic", default=self.options["subscribe"]
+        self.source_options["subscribe"] = spark.conf.get(
+            key=f"{self.config_prefix}.topic", default=self.source_options["subscribe"]
         )
         # example: hostname:9092,hostname2:9092
-        self.options["kafka.bootstrap.servers"] = spark.conf.get(
+        self.source_options["kafka.bootstrap.servers"] = spark.conf.get(
             key=f"{self.config_options_prefix}.kafka.bootstrap.servers", default=None
         )
-        self.options["mode"] = spark.conf.get(
-            key=f"{self.config_options_prefix}.mode", default=self.options["mode"]
+        self.source_options["mode"] = spark.conf.get(
+            key=f"{self.config_options_prefix}.mode", default=self.source_options["mode"]
         )
-        self.options["startingOffsets"] = spark.conf.get(
+        self.source_options["startingOffsets"] = spark.conf.get(
             key=f"{self.config_options_prefix}.startingOffsets",
-            default=self.options["startingOffsets"],
+            default=self.source_options["startingOffsets"],
         )
-        self.options["startingTimestamp"] = spark.conf.get(
+        self.source_options["startingTimestamp"] = spark.conf.get(
             key=f"{self.config_options_prefix}.startingTimestamp", default=None
         )
-        self.options["startingOffsetsByTimestampStrategy"] = spark.conf.get(
+        self.source_options["startingOffsetsByTimestampStrategy"] = spark.conf.get(
             key=f"{self.config_options_prefix}.startingOffsetsByTimestampStrategy",
             default=None,
         )
-        self.options["fetchOffset.retryIntervalMs"] = spark.conf.get(
+        self.source_options["fetchOffset.retryIntervalMs"] = spark.conf.get(
             key=f"{self.config_options_prefix}.fetchOffset.retryIntervalMs",
-            default=self.options["fetchOffset.retryIntervalMs"],
+            default=self.source_options["fetchOffset.retryIntervalMs"],
         )
-        self.options["endingOffsets"] = spark.conf.get(
+        self.source_options["endingOffsets"] = spark.conf.get(
             key=f"{self.config_options_prefix}.endingOffsets", default=None
         )
-        self.options["endingTimestamp"] = spark.conf.get(
+        self.source_options["endingTimestamp"] = spark.conf.get(
             key=f"{self.config_options_prefix}.endingTimestamp", default=None
         )
-        self.options["minPartitions"] = spark.conf.get(
+        self.source_options["minPartitions"] = spark.conf.get(
             key=f"{self.config_options_prefix}.minPartitions",
-            default=self.options["minPartitions"],
+            default=self.source_options["minPartitions"],
         )
-        self.options["minOffsetsPerTrigger"] = spark.conf.get(
+        self.source_options["minOffsetsPerTrigger"] = spark.conf.get(
             key=f"{self.config_options_prefix}.minOffsetsPerTrigger",
-            default=self.options["minOffsetsPerTrigger"],
+            default=self.source_options["minOffsetsPerTrigger"],
         )
-        self.options["maxOffsetsPerTrigger"] = spark.conf.get(
+        self.source_options["maxOffsetsPerTrigger"] = spark.conf.get(
             key="spark.app.source.kafka.options.maxOffsetsPerTrigger", default="5000"
         )
         return self
 
-    def source_config(self) -> Dict[str, str]:
-        """
-        Generates a dictionary by filtering the `options` instance attribute for
-        key-value pairs where the value is not `None`.
 
-        This method iterates over the `options` attribute, which is expected to be
-        a dictionary, and returns a filtered dictionary containing only the key-value
-        pairs where the value is not `None`. Useful for creating a configuration
-        dictionary based on the user's provided options.
-
-        :return: A dictionary of key-value pairs from `options` where the value is not
-            `None`
-        :rtype: Dict[str, str]
-        """
-        return {
-            k if not str(k).startswith(self.config_options_prefix)
-            else k.replace(f".{self.config_options_prefix}", ''): v
-            for k, v in self.options.items() if v is not None
-        }
-
-
-    def generate(self) -> DataStreamReader:
+    def generate(self, session: Optional[SparkSession] = None) -> DataStreamReader:
         """
         Generates a DataStreamReader configured for reading data from the specified source.
 
@@ -256,13 +218,7 @@ class KafkaStreamingSource:
         :return: A DataStreamReader configured for consuming data from Kafka.
         :rtype: DataStreamReader
         """
-
+        spark = session or SparkSession.active()
         if not self._initialized:
-            self.with_config({})
-        return (
-            self
-            .app
-            .generate_read_stream(self.source_config())
-            .format("kafka")
-        )
-
+            self.with_config({}, spark)
+        return self.generate_read_stream(spark, self.options())
