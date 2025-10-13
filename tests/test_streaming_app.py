@@ -12,6 +12,7 @@ def test_app_init():
         # or with, `.with_delta_sink({...})`
         # or to hook into the app for simple testing
         .with_config({
+            'spark.app.name': 'pyspark_streaming_base:default:app',
             'spark.app.checkpoints.path': '/src/test/resources/',
             'spark.app.checkpoints.version': '1.0.0'
         })
@@ -27,9 +28,10 @@ def test_app_init():
 def test_app_simple_init():
     app: StreamingApp = StreamingApp(
         app_config={
+            'spark.app.name': 'pyspark_streaming_base:default:app',
             'spark.app.checkpoints.path': '/src/test/resources/',
             'spark.app.checkpoints.version': '1.0.0'
-        })
+        }).initialize()
 
     assert app.checkpoint_location().as_posix() == expected_checkpoint_dir
 
