@@ -205,3 +205,10 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# specific to this project
+tests/resources/checkpoints/test:streaming:delta_source_to_delta_sink
+tests/resources/delta_streaming_sink/covid19
+
+.DS_Store
+*/DS_Store
