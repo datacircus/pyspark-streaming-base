@@ -31,7 +31,10 @@ def test_app_simple_init():
             'spark.app.name': 'pyspark_streaming_base:default:app',
             'spark.app.checkpoints.path': '/src/test/resources/',
             'spark.app.checkpoints.version': '1.0.0'
-        }).initialize()
+        }
+    )
+    # note: there is no need to initialize here since
+    # by applying the config with the constructor, we can automate the initialization step
 
     assert app.checkpoint_location().as_posix() == expected_checkpoint_dir
 

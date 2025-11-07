@@ -2,6 +2,7 @@
 name = "pyspark-streaming-base"
 version = "0.1.0"
 description = "This project provides a set of base classes that simplify the art of crafting bullet-proof Spark Structured Streaming applications."
+keywords = ["pyspark", "structured streaming", "kafka", "delta lake"]
 readme = "README.md"
 authors = [
     { name = "Scott Haines", email = "newfrontcreative@gmail.com" }
@@ -10,12 +11,18 @@ requires-python = ">=3.13"
 dependencies = [
     "delta-spark>=4.0.0",
     "pyspark>=4.0.1",
-    "python-dotenv>=1.1.1",
+    "python-dotenv>=1.2.1",
+    "ruff>=0.14.4",
+    "uv-build>=0.9.8,<0.10.0",
 ]
 
+[project.urls]
+Repository = "https://github.com/datacircus/pyspark-streaming-base"
+Releases = "https://github.com/datacircus/pyspark-streaming-base/releases"
+
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.9.8,<0.10.0"]
+build-backend = "uv_build"
 
 [dependency-groups]
 dev = [

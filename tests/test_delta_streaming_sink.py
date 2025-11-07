@@ -1,4 +1,3 @@
-import pytest
 from pyspark.sql import DataFrame
 from pyspark.sql.streaming import StreamingQuery
 from pyspark_streaming_base.app import StreamingApp
@@ -10,9 +9,10 @@ def test_delta_streaming_sink():
 
     delta_source_table_name = 'test_table'
     test_app_name = 'test:streaming:delta_source_to_delta_sink'
-    checkpoints_path = Path(f'./resources/checkpoints/').absolute().as_posix()
+    checkpoints_path = Path(__file__).parent.joinpath('./resources/checkpoints/').absolute().as_posix()
     delta_sink_table_name = 'covid19'
-    delta_sink_table_dir = Path(f'./resources/delta_streaming_sink/').joinpath(delta_sink_table_name).absolute()
+    delta_sink_table_dir = (Path(__file__).parent.joinpath('./resources/delta_streaming_sink/')
+                            .joinpath(delta_sink_table_name).absolute())
 
     app: StreamingApp = (
         StreamingApp()
@@ -41,8 +41,8 @@ def test_delta_streaming_sink():
             'spark.app.source.delta.options.ignoreChanges': 'true',
             'spark.app.source.delta.options.withEventTimeOrder': 'true',
             # if the table has a path, then we expect it is unmanaged
-            'spark.app.source.delta.options.path': Path(
-                f'./resources/delta_streaming_source/{delta_source_table_name}').absolute().as_posix(),
+            'spark.app.source.delta.options.path': Path(__file__).parent
+            .joinpath('resources/delta_streaming_source', delta_source_table_name).absolute().as_posix(),
         })
         # separating the config for readability
         .with_config({
@@ -90,8 +90,3 @@ def test_delta_streaming_sink():
 
     # try writing all data from the 'test_table' source -> 'covid19' sink
     query.processAllAvailable()
-
-    k = ''
-
-
-
