@@ -9,9 +9,10 @@ def test_delta_streaming_sink():
 
     delta_source_table_name = 'test_table'
     test_app_name = 'test:streaming:delta_source_to_delta_sink'
-    checkpoints_path = Path('./resources/checkpoints/').absolute().as_posix()
+    checkpoints_path = Path(__file__).parent.joinpath('./resources/checkpoints/').absolute().as_posix()
     delta_sink_table_name = 'covid19'
-    delta_sink_table_dir = Path('./resources/delta_streaming_sink/').joinpath(delta_sink_table_name).absolute()
+    delta_sink_table_dir = (Path(__file__).parent.joinpath('./resources/delta_streaming_sink/')
+                            .joinpath(delta_sink_table_name).absolute())
 
     app: StreamingApp = (
         StreamingApp()
