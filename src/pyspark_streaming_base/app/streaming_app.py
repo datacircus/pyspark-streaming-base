@@ -19,8 +19,10 @@ class StreamingApp(App):
 
     def __init__(self,
                  session: Optional[SparkSession] = None,
-                 app_config: Dict[str, str] = None) -> None:
+                 app_config: Optional[Dict[str, str]] = None) -> None:
+
         super().__init__(session, app_config)
+
 
     def initialize(self) -> Self:
         super().initialize()

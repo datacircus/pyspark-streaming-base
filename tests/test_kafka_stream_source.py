@@ -1,12 +1,9 @@
-import pytest
-
 from typing import Dict
 
 from pyspark.sql import DataFrame
 from pyspark.sql.streaming import DataStreamReader
 
 from pyspark_streaming_base.app import StreamingApp
-from pyspark_streaming_base.sources.kafka_source import KafkaStreamingSource
 
 def test_kafka_streaming_source():
     # create the base application

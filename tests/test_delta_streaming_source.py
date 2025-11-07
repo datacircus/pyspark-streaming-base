@@ -25,8 +25,8 @@ def test_delta_streaming_source():
             'spark.app.source.delta.options.ignoreChanges': 'true',
             'spark.app.source.delta.options.withEventTimeOrder': 'true',
             # if the table has a path, then we expect it is unmanaged
-            'spark.app.source.delta.options.path': Path(
-                f'./resources/delta_streaming_source/{table_name_for_test}').absolute().as_posix(),
+            'spark.app.source.delta.options.path': Path(__file__).parent
+            .joinpath('resources/delta_streaming_source', table_name_for_test).absolute().as_posix(),
         })
         # separating the config for readability
         .with_config({
