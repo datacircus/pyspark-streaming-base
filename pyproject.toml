@@ -19,6 +19,7 @@ dependencies = [
 [project.urls]
 Repository = "https://github.com/datacircus/pyspark-streaming-base"
 Releases = "https://github.com/datacircus/pyspark-streaming-base/releases"
+PyPI = "https://pypi.org/project/pyspark-streaming-base/"
 
 [build-system]
 requires = ["uv_build>=0.9.8,<0.10.0"]
