@@ -1,6 +1,9 @@
 # pyspark-streaming-base
 This project provides a set of base classes that simplify the art of crafting bullet-proof Spark Structured Streaming applications.
 
+<img width="348" height="367" alt="AutoSloth" src="https://github.com/user-attachments/assets/446a8a26-4d27-4d20-b45a-4394d823f5ec" />
+
+
 ## The Environment
 * [uv](https://docs.astral.sh/uv/guides/install-python/)
 * [Spark 4.0.1](https://spark.apache.org/downloads.html). This should match the pyspark version in the [pyproject.toml](./pyproject.toml)
