@@ -1,6 +1,6 @@
 [project]
 name = "pyspark-streaming-base"
-version = "0.1.0"
+version = "0.1.1"
 description = "This project provides a set of base classes that simplify the art of crafting bullet-proof Spark Structured Streaming applications."
 keywords = ["pyspark", "structured streaming", "kafka", "delta lake"]
 readme = "README.md"

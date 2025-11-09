@@ -4,6 +4,9 @@ dev:
 version:
 	@uv version --short
 
+bump:
+	@uv version --bump patch
+
 build:
 	@uv sync
 	@uv run ruff check
