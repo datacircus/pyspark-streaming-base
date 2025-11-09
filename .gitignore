@@ -209,6 +209,8 @@ __marimo__/
 # specific to this project
 tests/resources/checkpoints/test:streaming:delta_source_to_delta_sink
 tests/resources/delta_streaming_sink/covid19
+tests/resources/checkpoints/test:streaming:delta_end_to_end/
+tests/resources/delta_streaming_sink/covid19_e2e/
 
 .DS_Store
 */DS_Store
