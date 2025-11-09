@@ -100,8 +100,8 @@ query.awaitTermination()
 ### Documentation
 
 For comprehensive documentation including configuration reference, testing patterns, and best practices, see:
-- [Complete Getting Started Guide](./docs/overview.md)
-- [Developer Guide (CLAUDE.md)](./CLAUDE.md)
+- [Complete Getting Started Guide](https://github.com/datacircus/pyspark-streaming-base/blob/main/docs/overview.md)
+- [Developer Guide (CLAUDE.md)](https://github.com/datacircus/pyspark-streaming-base/blob/main/CLAUDE.md)
 
 ## Local Developer Environment
 
@@ -109,7 +109,7 @@ For comprehensive documentation including configuration reference, testing patte
 
 - **Python 3.13+** - Managed via [uv](https://docs.astral.sh/uv/guides/install-python/)
 - **Java 17 or 21** - Required for PySpark 4.0.1 (Spark uses Scala 2.13)
-- **PySpark 4.0.1** - Specified in [pyproject.toml](./pyproject.toml)
+- **PySpark 4.0.1** - Specified in [pyproject.toml](https://github.com/datacircus/pyspark-streaming-base/blob/main/pyproject.toml)
 
 ### Java Setup (Mac)
 
