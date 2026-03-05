@@ -74,15 +74,15 @@ wheels = [
 
 [[package]]
 name = "delta-spark"
-version = "4.0.0"
+version = "4.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "importlib-metadata" },
     { name = "pyspark" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/22/fd/37a0c2ee6fbf4dcbf034178dcb978ba586d37dc9c95214b90416d1042735/delta-spark-4.0.0.tar.gz", hash = "sha256:39325d76d6e5d8b5fea9d47827c59f5e0674844cb95f97b2cc613bfc5209c7ec", size = 35026, upload-time = "2025-06-06T01:41:46.286Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2f/09/d394015eb956c4475f6a949fb5fccedf7af19f97e981acbc81629e868a5e/delta_spark-4.1.0.tar.gz", hash = "sha256:98f73c2744f972919e0472974467f85d157810b617341ebf586374d91b8eadc7", size = 36808, upload-time = "2026-02-20T18:37:59.8Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/d8/265a93d22ae79262cdff701496a6f5676926a342153f3855ae6060430660/delta_spark-4.0.0-py3-none-any.whl", hash = "sha256:4e4ded07bb9ee4f6a0df45606d84395239d4b82001e765a627fecc1e914f3029", size = 39756, upload-time = "2025-06-06T01:41:44.815Z" },
+    { url = "https://files.pythonhosted.org/packages/b7/03/2e440efd4a49c8ecfbcb665dea7db94583cf33a365d8480e47fb0aa0dc39/delta_spark-4.1.0-py3-none-any.whl", hash = "sha256:d80f6ebca542df48f257f2535f9c8c21bbfda65771b6ec21be843c0087e1dece", size = 43877, upload-time = "2026-02-20T18:37:58.15Z" },
 ]
 
 [[package]]
@@ -144,16 +144,16 @@ wheels = [
 
 [[package]]
 name = "pyspark"
-version = "4.0.1"
+version = "4.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "py4j" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ae/40/1414582f16c1d7b051c668c2e19c62d21a18bd181d944cb24f5ddbb2423f/pyspark-4.0.1.tar.gz", hash = "sha256:9d1f22d994f60369228397e3479003ffe2dd736ba79165003246ff7bd48e2c73", size = 434204896, upload-time = "2025-09-06T07:15:57.091Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/19/bf/58ee13add151469c25825b7125bbf62c3bdcec05eec4d458fcb5c5516066/pyspark-4.1.1.tar.gz", hash = "sha256:77f78984aa84fbe865c717dd37b49913b4e5c97d76ef6824f932f1aefa6621ec", size = 455359625, upload-time = "2026-01-09T09:38:38.28Z" }
 
 [[package]]
 name = "pyspark-streaming-base"
-version = "0.1.2"
+version = "0.1.3"
 source = { editable = "." }
 dependencies = [
     { name = "delta-spark" },
@@ -171,8 +171,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "delta-spark", specifier = ">=4.0.0" },
-    { name = "pyspark", specifier = ">=4.0.1" },
+    { name = "delta-spark", specifier = ">=4.1.0" },
+    { name = "pyspark", specifier = ">=4.1.0" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
     { name = "ruff", specifier = ">=0.14.4" },
     { name = "uv-build", specifier = ">=0.9.8,<0.10.0" },
