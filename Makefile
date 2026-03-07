@@ -1,6 +1,9 @@
 dev:
 	@uv install python 3.12.3
 
+lock:
+	@uv lock
+
 version:
 	@uv version --short
 

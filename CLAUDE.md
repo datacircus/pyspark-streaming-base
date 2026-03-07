@@ -25,6 +25,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 This project uses [uv](https://docs.astral.sh/uv/) for dependency management:
 ```bash
 uv sync                                                  # Install dependencies
+uv lock                                                  # Update lock file (run after changing .python-version or pyproject.toml deps)
 uv build                                                 # Build package
 uv run pytest                                            # Run all tests
 uv run pytest --cov=pyspark_streaming_base --cov-report term  # Run with coverage
@@ -32,9 +33,31 @@ uv run pytest tests/test_streaming_app.py               # Run single test file
 uv run pytest tests/test_streaming_app.py::test_app_init     # Run single test
 ```
 
+### Modifying the lock file
+
+Run `uv lock` whenever you change:
+
+- **Python version** (`.python-version` or `requires-python` in `pyproject.toml`)
+- **Dependencies** in `pyproject.toml` (add, remove, or change versions)
+
+```bash
+uv lock          # Regenerate lock from current pyproject.toml and .python-version
+# or
+make lock        # Same as uv lock
+```
+
+If the lock is out of sync or you want a clean regenerate (e.g. after a Python version change), delete it first then lock:
+
+```bash
+rm uv.lock && uv lock
+```
+
+Commit the updated `uv.lock` so CI and other developers get the same resolved versions.
+
 ### Makefile Commands
 ```bash
 make dev        # Install Python 3.12.3
+make lock       # Update lock file (uv lock)
 make version    # Show uv version
 make build      # Sync deps, run ruff check, run tests, build package
 make test       # Run pytest
