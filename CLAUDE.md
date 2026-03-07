@@ -9,7 +9,7 @@ pyspark-streaming-base provides base classes for building bullet-proof Spark Str
 ## Development Environment
 
 ### Prerequisites
-- Python 3.13+ (managed via `uv`)
+- Python 3.12.3+ (managed via `uv`)
 - Java 17 or 21 (Spark 4.0.1 compatible)
 - PySpark 4.0.1
 - Delta Lake 4.0.0
@@ -34,7 +34,7 @@ uv run pytest tests/test_streaming_app.py::test_app_init     # Run single test
 
 ### Makefile Commands
 ```bash
-make dev        # Install Python 3.13
+make dev        # Install Python 3.12.3
 make version    # Show uv version
 make build      # Sync deps, run ruff check, run tests, build package
 make test       # Run pytest

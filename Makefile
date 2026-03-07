@@ -1,5 +1,5 @@
 dev:
-	@uv install python 3.13
+	@uv install python 3.12.3
 
 version:
 	@uv version --short

@@ -107,7 +107,7 @@ For comprehensive documentation including configuration reference, testing patte
 
 ### Prerequisites
 
-- **Python 3.13+** - Managed via [uv](https://docs.astral.sh/uv/guides/install-python/)
+- **Python 3.12.3+** - Managed via [uv](https://docs.astral.sh/uv/guides/install-python/)
 - **Java 17 or 21** - Required for PySpark 4.0.1 (Spark uses Scala 2.13)
 - **PySpark 4.0.1** - Specified in [pyproject.toml](https://github.com/datacircus/pyspark-streaming-base/blob/main/pyproject.toml)
 
@@ -127,8 +127,8 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 ### Setup and Development
 
 ```bash
-# Install Python 3.13
-uv python install 3.13
+# Install Python 3.12.3
+uv python install 3.12.3
 
 # Sync dependencies
 uv sync
