@@ -96,8 +96,9 @@ class DeltaStreamingSink(StreamingSink):
         final_options = {
             'checkpointLocation': stream_options['checkpointLocation'],
             'mergeSchema': stream_options['mergeSchema'],
-            'path': stream_options['path']
         }
+        if stream_options.get('path'):
+            final_options['path'] = stream_options['path']
         return self.generate_write_stream(df, {k:v for k,v in final_options.items() if v is not None})
 
     def fromDF(self, df: DataFrame) -> DataStreamWriter:

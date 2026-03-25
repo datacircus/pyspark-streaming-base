@@ -19,6 +19,10 @@ class App(SparkLoggingProvider):
     # placeholder for the SparkLoggingProvider py4j.gateway instance
     logger = None
 
+    def is_spark_connect(self) -> bool:
+        """Returns True if the active SparkSession is a Spark Connect session, False for traditional Spark."""
+        return "connect" in type(self.spark).__module__
+
     @staticmethod
     def generate_spark_session() -> SparkSession:
         """
